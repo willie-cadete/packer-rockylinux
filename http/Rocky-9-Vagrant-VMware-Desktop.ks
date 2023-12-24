@@ -3,6 +3,10 @@
 # Use text install
 text
 
+# License agreement
+eula --agreed
+reboot
+
 # Use CDROM installation media
 cdrom
 repo --name="AppStream" --baseurl=file:///run/install/sources/mount-0000-cdrom/AppStream
