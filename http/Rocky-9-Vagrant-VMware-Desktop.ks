@@ -33,7 +33,11 @@ clearpart --none --initlabel --disklabel=gpt
 part biosboot  --size=1    --fstype=biosboot --asprimary
 part /boot/efi --size=100  --fstype=efi      --asprimary
 part /boot     --size=1000 --fstype=xfs      --label=boot
-part /         --grow --fstype="xfs" --label=root
+part pv.01 --fstype="lvmpv" --grow
+volgroup os pv.01
+logvol /home --vgname=os --size=20000 --name=home --fstype=xfs
+logvol / --vgname=os --size=50000 --name=root --fstype=xfs
+logvol swap --vgname=os --size=2000 --name=swap --fstype=swap
 
 %addon com_redhat_kdump --enable --reserve-mb='auto'
 
