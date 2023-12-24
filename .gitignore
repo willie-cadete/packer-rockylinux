@@ -1,0 +1,11 @@
+# Packer
+packer_cache/
+*.iso
+output-*
+
+# Vagrant
+.vagrant/
+*.box
+
+# OSX
+.DS_store
