@@ -25,4 +25,4 @@ Contributions are welcome! If you would like to contribute to this project, plea
 
 ## License
 
-This project is licensed under the [MIT License](link-to-license-file). Please see the [LICENSE](link-to-license-file) file for more details.
+This project is licensed under the [MIT License](LICENSE).
