@@ -75,4 +75,48 @@ curl -Lo /home/vagrant/.ssh/authorized_keys https://raw.githubusercontent.com/ha
 chmod 0600 /home/vagrant/.ssh/authorized_keys
 chown -R vagrant:vagrant /home/vagrant/.ssh
 
+# Blacklist the floppy module to avoid probing timeouts
+echo blacklist floppy > /etc/modprobe.d/nofloppy.conf
+chcon -u system_u -r object_r -t modules_conf_t /etc/modprobe.d/nofloppy.conf
+
+# Decrease connection time by preventing reverse DNS lookups
+# (see https://lists.centos.org/pipermail/centos-devel/2016-July/014981.html
+#  and man sshd for more information)
+OPTIONS="-u0"
+EOF
+
+# systemd should generate a new machine id during the first boot, to
+# avoid having multiple Vagrant instances with the same id in the local
+# network. /etc/machine-id should be empty, but it must exist to prevent
+# boot errors (e.g.  systemd-journald failing to start).
+:>/etc/machine-id
+
+# Customize the initramfs
+pushd /etc/dracut.conf.d
+# Enable VMware PVSCSI support for VMware Fusion guests.
+echo 'add_drivers+=" vmw_pvscsi "' > vmware-fusion-drivers.conf
+echo 'add_drivers+=" hv_netvsc hv_storvsc hv_utils hv_vmbus hid-hyperv "' > hyperv-drivers.conf
+# There's no floppy controller, but probing for it generates timeouts
+echo 'omit_drivers+=" floppy "' > nofloppy.conf
+popd
+# Fix the SELinux context of the new files
+restorecon -f - <<EOF
+/etc/sudoers.d/vagrant
+/etc/dracut.conf.d/vmware-fusion-drivers.conf
+/etc/dracut.conf.d/nofloppy.conf
+EOF
+
+# Rerun dracut for the installed kernel (not the running kernel):
+KERNEL_VERSION=$(rpm -q kernel --qf '%{version}-%{release}.%{arch}\n')
+dracut -f /boot/initramfs-${KERNEL_VERSION}.img ${KERNEL_VERSION}
+
+#Upgrade the whole system
+dnf upgrade -y
+dnf clean all
+
+# Seal for deployment
+rm -rf /etc/ssh/ssh_host_*
+hostnamectl set-hostname localhost.localdomain
+rm -rf /etc/udev/rules.d/70-*
+
 %end
