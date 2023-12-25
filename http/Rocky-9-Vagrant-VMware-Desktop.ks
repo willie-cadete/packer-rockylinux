@@ -66,9 +66,13 @@ xconfig  --startxonboot
 %post --log=/root/ks-post.log
 
 #Vagrant sudo configuration
-echo "vagrant        ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers.d/vagrant
-sed -i "s/^.*requiretty/#Defaults requiretty/" /etc/sudoers 
+echo "%vagrant ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/vagrant
+chmod 0440 /etc/sudoers.d/vagrant
 
-dnf update -y
+#Default insecure vagrant key
+mkdir -pm 700 /home/vagrant/.ssh
+curl -Lo /home/vagrant/.ssh/authorized_keys https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub
+chmod 0600 /home/vagrant/.ssh/authorized_keys
+chown -R vagrant:vagrant /home/vagrant/.ssh
 
 %end
