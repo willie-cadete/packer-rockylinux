@@ -60,8 +60,8 @@ git
 
 services --enabled=vmtoolsd
 
-# Run the Setup Agent on first boot
-firstboot --enable
+# X Window System configuration information
+xconfig  --startxonboot
 
 %post --log=/root/ks-post.log
 
