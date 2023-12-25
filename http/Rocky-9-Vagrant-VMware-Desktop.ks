@@ -50,7 +50,10 @@ logvol swap --vgname=os --size=2000 --name=swap --fstype=swap
 %packages
 @^workstation-product-environment
 @container-management
-@development
+git
+# Microcode updates cannot work in a VM
+-microcode_ctl
+# Firmware packages are not needed in a VM
 -iwl*-firmware
 
 %end
