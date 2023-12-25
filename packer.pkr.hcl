@@ -53,6 +53,7 @@ build {
   # }
 
   post-processor "vagrant" {
+    keep_input_artifact = false
     output = "output/{{ .Provider }}/{{ .BuildName }}.box"
   }
 }
